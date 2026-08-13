@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikita's Sky</title>
+<style>
+  :root {
+    --pink:        #e91e8c;
+    --pink-dark:   #c4177a;
+    --pink-deeper: #9d1261;
+    --pink-light:  #fce4f3;
+    --pink-soft:   #fdf2fa;
+
+    --bg:          #fdf4fb;
+    --surface:     #ffffff;
+    --surface2:    #f8eef6;
+    --border:      #f0d9ec;
+    --text:        #1a0d17;
+    --text-2:      #6b4a63;
+    --text-3:      #a07898;
+    --shadow-sm:   0 1px 3px rgba(200,50,150,.08), 0 2px 8px rgba(200,50,150,.06);
+    --shadow-md:   0 4px 16px rgba(200,50,150,.14), 0 8px 32px rgba(0,0,0,.06);
+    --shadow-lg:   0 8px 32px rgba(200,50,150,.18), 0 20px 60px rgba(0,0,0,.10);
+    --radius:      14px;
+    --radius-sm:   8px;
+    --radius-pill: 100px;
+    --header-bg:   linear-gradient(135deg, #e91e8c 0%, #c4177a 50%, #9d1261 100%);
+    --toggle-bg:   rgba(255,255,255,.18);
+  }
+  [data-theme="dark"] {
+    --bg:          #1a0d17;
+    --surface:     #261320;
+    --surface2:    #321829;
+    --border:      #4a2040;
+    --text:        #fce4f3;
+    --text-2:      #d4a0c4;
+    --text-3:      #8a5878;
+    --shadow-sm:   0 1px 3px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+    --shadow-md:   0 4px 16px rgba(0,0,0,.4), 0 8px 32px rgba(0,0,0,.3);
+    --shadow-lg:   0 8px 32px rgba(0,0,0,.5), 0 20px 60px rgba(0,0,0,.4);
+    --pink-light:  #4a1a3a;
+    --pink-soft:   #3a1230;
+    --header-bg:   linear-gradient(135deg, #8a0f54 0%, #6b0b43 50%, #4d0832 100%);
+    --toggle-bg:   rgba(255,255,255,.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { transition: color-scheme .2s; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background .25s, color .25s;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--header-bg);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.6px;
+    line-height: 1.1;
+  }
+  .header-sub { font-size: .82rem; color: rgba(255,255,255,.6); font-weight: 400; }
+  .hdr-btns { display: flex; gap: 8px; align-items: center; }
+  .hdr-btn {
+    background: var(--toggle-bg);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,.25);
+    border-radius: var(--radius-sm);
+    padding: 9px 16px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s, border-color .15s;
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+  .hdr-btn:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.45); }
+  .hdr-btn.primary {
+    background: #fff;
+    color: var(--pink);
+    border-color: transparent;
+  }
+  .hdr-btn.primary:hover { background: rgba(255,255,255,.9); }
+  .hdr-btn.danger { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.35); color: #fca5a5; }
+  .hdr-btn.danger:hover { background: rgba(239,68,68,.32); border-color: rgba(239,68,68,.6); color: #fff; }
+  #btn-theme { padding: 9px 10px; }
+
+  /* ── Controls ── */
+  .controls {
+    padding: 20px 28px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .search-wrap {
+    flex: 1 1 220px;
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-3);
+    pointer-events: none;
+  }
+  #search {
+    width: 100%;
+    padding: 10px 16px 10px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: .92rem;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color .15s, background .25s;
+  }
+  #search::placeholder { color: var(--text-3); }
+  #search:focus { border-color: var(--pink); }
+  #cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-2);
+    transition: all .15s;
+  }
+  .cat-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .cat-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+  /* ── Grid ── */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+    padding: 8px 28px 40px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s, border-color .2s, background .25s;
+    position: relative;
+    cursor: default;
+  }
+  .card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--pink-light); }
+  .card-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink) 0%, #ff79c8 100%);
+    border-radius: var(--radius) var(--radius) 0 0;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .card:hover .card-accent { opacity: 1; }
+  .card-top { display: flex; align-items: center; gap: 10px; }
+  .favicon-wrap {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--pink-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--pink-light);
+  }
+  .favicon { width: 22px; height: 22px; object-fit: contain; }
+  .card-meta { flex: 1; min-width: 0; }
+  .card-title { font-size: .93rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-title a { color: var(--text); text-decoration: none; }
+  .card-title a:hover { color: var(--pink); }
+  .card-url { font-size: .75rem; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card-cat {
+    display: inline-flex; align-items: center;
+    background: var(--pink-light);
+    color: var(--pink);
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+  }
+  [data-theme="dark"] .card-cat { background: var(--pink-soft); }
+  .card-notes { font-size: .8rem; color: var(--text-2); line-height: 1.55; }
+  .card-actions { display: flex; gap: 2px; flex-shrink: 0; }
+  .btn-del, .btn-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-3);
+    padding: 5px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: color .15s, background .15s;
+  }
+  .btn-del:hover  { color: #ef4444; background: rgba(239,68,68,.08); }
+  .btn-edit:hover { color: var(--pink); background: rgba(233,30,140,.08); }
+
+  /* ── Empty ── */
+  #empty {
+    display: none;
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--text-3);
+  }
+  .empty-icon {
+    width: 72px; height: 72px;
+    background: var(--pink-soft);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    border: 2px solid var(--pink-light);
+  }
+  #empty h3 { font-size: 1rem; font-weight: 700; color: var(--text-2); margin-bottom: 6px; }
+  #empty p { font-size: .88rem; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: var(--radius-pill);
+    font-size: .85rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity .25s, transform .25s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Modal ── */
+  #overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  #overlay.open { display: flex; }
+  #modal {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 30px;
+    width: min(500px, 93vw);
+    box-shadow: var(--shadow-lg);
+    border: 1.5px solid var(--border);
+    animation: slide-in .2s ease;
+  }
+  @keyframes slide-in { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  #modal h2 { font-size: 1.15rem; font-weight: 800; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--text-3); padding: 4px; border-radius: 6px; }
+  .modal-close:hover { color: var(--text); }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field label { font-size: .76rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .6px; }
+  .field input, .field textarea {
+    padding: 10px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: .92rem;
+    outline: none;
+    font-family: inherit;
+    background: var(--surface2);
+    color: var(--text);
+    transition: border-color .15s, background .25s;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--pink); background: var(--surface); }
+  .field textarea { resize: vertical; min-height: 76px; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .btn-cancel {
+    background: var(--surface2);
+    color: var(--text-2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 18px;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-cancel:hover { background: var(--border); }
+  .btn-save {
+    background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 22px;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    box-shadow: 0 2px 8px rgba(233,30,140,.35);
+  }
+  .btn-save:hover { opacity: .92; }
+  .btn-save:active { transform: scale(.97); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    header { padding: 16px 18px; }
+    .hdr-btn .btn-label { display: none; }
+    .controls { padding: 14px 18px 10px; }
+    #grid { padding: 6px 18px 32px; grid-template-columns: 1fr; }
+    #modal { padding: 22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>&#10024; Nikita's Sky</h1>
+    <span class="header-sub" id="count-label">Loading…</span>
+  </div>
+  <div class="hdr-btns">
+    <button class="hdr-btn" id="btn-theme" onclick="toggleTheme()" title="Toggle theme">
+      <span id="theme-icon">🌙</span>
+    </button>
+    <button class="hdr-btn danger" id="btn-clear" onclick="deleteAll()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      <span class="btn-label">Delete All</span>
+    </button>
+    <button class="hdr-btn" id="btn-import" onclick="document.getElementById('file-import').click()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span class="btn-label">Import</span>
+    </button>
+    <button class="hdr-btn" id="btn-export" onclick="exportBookmarks()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="btn-label">Export</span>
+    </button>
+    <button class="hdr-btn primary" id="btn-add" onclick="openModal()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span class="btn-label">Add Bookmark</span>
+    </button>
+  </div>
+  <input type="file" id="file-import" accept=".html,.htm" style="display:none" onchange="importFile(this)">
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search" type="text" placeholder="Search bookmarks…" oninput="sq=this.value;render()">
+  </div>
+  <div id="cats"></div>
+</div>
+
+<div id="grid">
+  <div id="empty">
+    <div class="empty-icon">
+      <svg width="32" height="32" fill="none" stroke="var(--pink)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+    </div>
+    <h3>No bookmarks found</h3>
+    <p>Try a different search or add a new one above</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="overlay" onclick="if(event.target===this)closeModal()">
+  <div id="modal">
+    <div class="modal-header">
+      <h2>Add Bookmark</h2>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="field"><label>Title *</label><input id="f-title" placeholder="e.g. MDN Web Docs" autocomplete="off"></div>
+    <div class="field"><label>URL *</label><input id="f-url" placeholder="e.g. developer.mozilla.org" autocomplete="off"></div>
+    <div class="field">
+      <label>Category</label>
+      <input id="f-cat" list="cat-list" placeholder="e.g. Design" autocomplete="off">
+      <datalist id="cat-list"></datalist>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Optional notes…"></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveBookmark()">Save Bookmark</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var SAMPLES = [
+  { id:'s1', title:'MDN Web Docs', url:'https://developer.mozilla.org', cat:'Dev', notes:'The go-to reference for HTML, CSS, and JavaScript.' },
+  { id:'s2', title:'CSS-Tricks', url:'https://css-tricks.com', cat:'Dev', notes:'Tips, tricks, and techniques for CSS.' },
+  { id:'s3', title:'Can I Use', url:'https://caniuse.com', cat:'Dev', notes:'Browser support tables for web technologies.' },
+  { id:'s4', title:'GitHub', url:'https://github.com', cat:'Dev', notes:'Host and review code.' },
+  { id:'s5', title:'Figma', url:'https://figma.com', cat:'Design', notes:'Collaborative interface design tool.' },
+  { id:'s6', title:'Dribbble', url:'https://dribbble.com', cat:'Design', notes:'Design inspiration and community.' },
+  { id:'s7', title:'Hacker News', url:'https://news.ycombinator.com', cat:'News', notes:'Tech news and community discussion.' },
+  { id:'s8', title:'Wikipedia', url:'https://wikipedia.org', cat:'Reference', notes:'Free online encyclopedia.' },
+  { id:'s9', title:'YouTube', url:'https://youtube.com', cat:'Entertainment', notes:'Video streaming platform.' },
+];
+
+var KEY = 'bm_bookmarks_v1';
+var THEME_KEY = 'bm_theme_v1';
+var bm = [], activeCat = 'All', sq = '', editingId = null;
+
+function load() {
+  try { var s = localStorage.getItem(KEY); bm = s ? JSON.parse(s) : SAMPLES; } catch(e) { bm = SAMPLES; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(bm)); }
+function uid() { return '_' + Math.random().toString(36).slice(2,10); }
+function host(url) { try { return new URL(url).hostname; } catch(e) { return url; } }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function cats() { var c = []; bm.forEach(function(b){ if(b.cat && c.indexOf(b.cat)===-1) c.push(b.cat); }); c.sort(); return ['All'].concat(c); }
+function list() {
+  return bm.filter(function(b) {
+    var q = sq.toLowerCase();
+    var mQ = !q || b.title.toLowerCase().indexOf(q)>-1 || (b.cat||'').toLowerCase().indexOf(q)>-1 || (b.notes||'').toLowerCase().indexOf(q)>-1;
+    var mC = activeCat==='All' || b.cat===activeCat;
+    return mQ && mC;
+  });
+}
+
+/* Theme */
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-icon').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem(THEME_KEY, t);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+(function() {
+  var saved = localStorage.getItem(THEME_KEY);
+  if (saved) { applyTheme(saved); return; }
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+})();
+
+/* Toast */
+var _toastTimer;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2800);
+}
+
+/* Render */
+function renderCats() {
+  var c = cats();
+  document.getElementById('cats').innerHTML = c.map(function(cat) {
+    return '<button class="cat-btn' + (activeCat===cat?' active':'') + '" onclick="activeCat=\'' + esc(cat) + '\';render()">' + esc(cat) + '</button>';
+  }).join('');
+  var dl = document.getElementById('cat-list');
+  dl.innerHTML = c.filter(function(x){return x!=='All';}).map(function(x){ return '<option value="' + esc(x) + '">'; }).join('');
+}
+
+function renderGrid() {
+  var items = list();
+  var grid = document.getElementById('grid');
+  var empty = document.getElementById('empty');
+  var total = bm.length;
+  document.getElementById('count-label').textContent = total + ' bookmark' + (total!==1?'s':'') + ' saved';
+  if (!items.length) {
+    empty.style.display = 'block';
+    Array.from(grid.children).forEach(function(el){ if(el!==empty) el.remove(); });
+    return;
+  }
+  empty.style.display = 'none';
+  var html = items.map(function(b) {
+    var h = host(b.url);
+    var favicon = 'https://www.google.com/s2/favicons?sz=64&domain=' + encodeURIComponent(h);
+    return '<div class="card" id="c' + esc(b.id) + '">' +
+      '<div class="card-accent"></div>' +
+      '<div class="card-top">' +
+        '<div class="favicon-wrap"><img class="favicon" src="' + favicon + '" alt="" onerror="this.style.display=\'none\'"></div>' +
+        '<div class="card-meta">' +
+          '<div class="card-title"><a href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.title) + '</a></div>' +
+          '<div class="card-url">' + esc(h) + '</div>' +
+        '</div>' +
+      '</div>' +
+      (b.notes ? '<div class="card-notes">' + esc(b.notes) + '</div>' : '') +
+      '<div class="card-footer">' +
+        (b.cat ? '<span class="card-cat">' + esc(b.cat) + '</span>' : '<span></span>') +
+        '<div class="card-actions">' +
+          '<button class="btn-edit" title="Edit" onclick="openEdit(\'' + esc(b.id) + '\')">' +
+            '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+          '</button>' +
+          '<button class="btn-del" title="Delete" onclick="del(\'' + esc(b.id) + '\')">' +
+            '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  grid.innerHTML = html + empty.outerHTML;
+}
+
+function render() { renderCats(); renderGrid(); }
+
+function del(id) {
+  bm = bm.filter(function(b){ return b.id!==id; });
+  save(); render();
+  toast('Bookmark deleted');
+}
+
+function deleteAll() {
+  if (!bm.length) { toast('No bookmarks to delete.'); return; }
+  if (!confirm('Delete all ' + bm.length + ' bookmark' + (bm.length!==1?'s':'') + '? This cannot be undone.')) return;
+  bm = [];
+  save(); render();
+  toast('All bookmarks deleted');
+}
+
+function openModal() {
+  editingId = null;
+  ['f-title','f-url','f-cat','f-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.querySelector('#modal h2').textContent = 'Add Bookmark';
+  document.querySelector('.btn-save').textContent = 'Save Bookmark';
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('f-title').focus();
+}
+
+function openEdit(id) {
+  var b = bm.find(function(x){ return x.id === id; });
+  if (!b) return;
+  editingId = id;
+  document.getElementById('f-title').value = b.title;
+  document.getElementById('f-url').value   = b.url;
+  document.getElementById('f-cat').value   = b.cat || '';
+  document.getElementById('f-notes').value = b.notes || '';
+  document.querySelector('#modal h2').textContent = 'Edit Bookmark';
+  document.querySelector('.btn-save').textContent = 'Update Bookmark';
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('f-title').focus();
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+
+function saveBookmark() {
+  var title = document.getElementById('f-title').value.trim();
+  var url   = document.getElementById('f-url').value.trim();
+  var cat   = document.getElementById('f-cat').value.trim();
+  var notes = document.getElementById('f-notes').value.trim();
+  if (!title) { document.getElementById('f-title').focus(); return; }
+  if (!url)   { document.getElementById('f-url').focus(); return; }
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  if (editingId) {
+    bm = bm.map(function(b) {
+      return b.id === editingId ? { id: b.id, title: title, url: url, cat: cat, notes: notes } : b;
+    });
+    toast('Bookmark updated!');
+  } else {
+    bm.unshift({ id: uid(), title: title, url: url, cat: cat, notes: notes });
+    toast('Bookmark saved!');
+  }
+  save(); closeModal();
+  activeCat = 'All';
+  document.getElementById('search').value = ''; sq = '';
+  render();
+}
+
+function exportBookmarks() {
+  if (!bm.length) { toast('No bookmarks to export.'); return; }
+  var byCat = {};
+  bm.forEach(function(b) {
+    var c = b.cat || 'Uncategorized';
+    if (!byCat[c]) byCat[c] = [];
+    byCat[c].push(b);
+  });
+  var lines = [
+    '<!DOCTYPE NETSCAPE-Bookmark-file-1>',
+    '<!-- This is an automatically generated file. -->',
+    '<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">',
+    '<TITLE>Nikita\'s Sky Bookmarks</TITLE>',
+    '<H1>Nikita\'s Sky Bookmarks</H1>',
+    '<DL><p>'
+  ];
+  Object.keys(byCat).sort().forEach(function(cat) {
+    lines.push('    <DT><H3>' + cat + '</H3>');
+    lines.push('    <DL><p>');
+    byCat[cat].forEach(function(b) {
+      var ts = Math.floor(Date.now() / 1000);
+      lines.push('        <DT><A HREF="' + b.url + '" ADD_DATE="' + ts + '">' + b.title.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</A>');
+    });
+    lines.push('    </DL><p>');
+  });
+  lines.push('</DL>');
+  var blob = new Blob([lines.join('\n')], { type: 'text/html' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nikitas-sky-bookmarks.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported ' + bm.length + ' bookmark' + (bm.length !== 1 ? 's' : '') + '!');
+}
+
+function importFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var imported = [];
+    // Use innerHTML so the non-standard Netscape DOCTYPE doesn't trigger quirks mode
+    var container = document.createElement('div');
+    container.innerHTML = e.target.result;
+    function walk(node, path) {
+      var pending = null;
+      var kids = Array.from(node.children);
+      for (var i = 0; i < kids.length; i++) {
+        var el = kids[i];
+        var tag = el.tagName.toUpperCase();
+        if (tag === 'DT' || tag === 'DD') {
+          // Use :scope > to match DIRECT children only.
+          // When innerHTML parses Netscape format, the browser embeds the <DL>
+          // inside <DT> (because </DT> is implicit), so we detect that case first.
+          var h3 = el.querySelector(':scope > h3, :scope > h4');
+          var a  = el.querySelector(':scope > a');
+          var dl = el.querySelector(':scope > dl');
+          if (dl) {
+            // DL is inside this DT — browser folded folder contents into the DT node
+            var folderName = h3 ? h3.textContent.trim() : null;
+            walk(dl, folderName ? path.concat(folderName) : path);
+          } else if (h3) {
+            pending = h3.textContent.trim();
+          } else if (a) {
+            var url = a.getAttribute('href') || '';
+            var title = a.textContent.trim();
+            var cat = path.length ? path[path.length - 1] : '';
+            if (url && /^https?:\/\//i.test(url) && title) {
+              var dup = imported.some(function(b){ return b.url===url; }) || bm.some(function(b){ return b.url===url; });
+              if (!dup) imported.push({ id:uid(), title:title, url:url, cat:cat, notes: path.length>1 ? path.join(' › ') : '' });
+            }
+          }
+        } else if (tag === 'DL' || tag === 'UL' || tag === 'OL') {
+          var newPath = pending !== null ? path.concat(pending) : path;
+          walk(el, newPath);
+          pending = null;
+        } else {
+          var saved = pending;
+          walk(el, path);
+          pending = saved;
+        }
+      }
+    }
+    walk(container, []);
+    if (!imported.length) { toast('No new bookmarks found in that file.'); return; }
+    bm = imported.concat(bm);
+    save(); activeCat='All'; sq='';
+    document.getElementById('search').value='';
+    render();
+    toast('Imported ' + imported.length + ' bookmark' + (imported.length!==1?'s':'') + '!');
+  };
+  reader.readAsText(file);
+}
+
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+load();
+render();
+</script>
+</body>
+</html>
